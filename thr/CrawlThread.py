@@ -22,14 +22,14 @@ class CrawlThread(Thread):
             if not DS.linkQueue.empty():
                 dt = datetime.datetime.now()
                 fName = "dumps/"+str(dt.year)+str(dt.month)+str(dt.day)+str(dt.hour)+str(dt.minute)+"t"+self.name
-                print(fName)
+                #print(fName)
                 f = open(fName,"a", encoding='utf-8')
-                print(DS.linkQueue.qsize())
-                
+                #print(DS.linkQueue.qsize())
+                url = ""
                 try:
                     c,u = DS.linkQueue.get()
-                    print("Processing (Cos:"+str(c)+" ): "+str(u))
-                    
+                    #print("Processing (Cos:"+str(c)+" ): "+str(u))
+                    url = u
                     dataParser = DP.DataParser()
                     rawData = urlrequest.urlopen(u).read().decode("utf-8")
                     dataParser.url = u
@@ -40,13 +40,22 @@ class CrawlThread(Thread):
                     cos = cosine.get_cosine(self.query, data)
                     
                     links = dataParser.get_links()
-                    print("\nLinks: ".join(links))
+                    #print("\nLinks: ".join(links))
                     
                     for l in links:
                         DS.linkQueue.put((-cos,l))
                     f.close()
+                    
+                    DS.size += (sys.getsizeof(data)/1073741824)
+                    DS.count += 1
+                    
+                    print("Total parsed size: " + str(DS.size) + " GB")
+                    print("Total parsed count: " + str(DS.count))
                 except:
-                    print(sys.exc_info()[0])
+                    logName = "logs/"+self.query.replace(" ","-") + ".log"
+                    logFile = open(logName, "a", encoding='utf-8')
+                    logFile.write(str("URL: "+str(url)+"; Error: "+str(sys.exc_info()[0])))
+                    logFile.close()
                     pass
                 finally:
                     if not f.closed:

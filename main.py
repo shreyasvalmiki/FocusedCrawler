@@ -12,6 +12,7 @@ from htmlparser import TextParser as TextParser
 from htmlparser import DataParser as DP
 from urllib import request as urlrequest
 from thr import CrawlThread as CT
+from thr import ParentThread as PT
 
 query = input("Enter query string: ")
 startNo = int(input("Enter seed number: "))
@@ -22,9 +23,12 @@ search.seturls()
 print ('\n')
 
 
-for i in range(startNo):
-    ct = CT.CrawlThread(query)
-    ct.start()
+pt = PT.ParentThread(query, startNo)
+pt.start()
+# 
+# for i in range(startNo):
+#     ct = CT.CrawlThread(query)
+#     ct.start()
 
 
 # 

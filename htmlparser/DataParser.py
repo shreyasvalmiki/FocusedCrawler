@@ -89,7 +89,6 @@ class DataParser(HTMLParser):
                 #print(data)
                 #self.f.write(str(data))
                 self.data = self.data + str(data)
-                print(str(data))
             except:
                 pass
         
