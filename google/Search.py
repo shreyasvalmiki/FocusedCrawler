@@ -46,7 +46,7 @@ class Search:
                     if len(searchUrls) >= self.size:
                         return searchUrls
                     print(result["unescapedUrl"])
-                    DS.linkQueue.put((0.0,result["unescapedUrl"]))
+                    DS.linkQueue.put((-1.0,result["unescapedUrl"]))
                     searchUrls.append(result["unescapedUrl"])
         except:
             print("Unexpected error:", sys.exc_info()[0])    

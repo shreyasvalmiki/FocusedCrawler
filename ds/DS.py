@@ -15,3 +15,5 @@ unreadLinks = Queue()
 count = 0
 
 size = 0.0
+
+threadCount = 10

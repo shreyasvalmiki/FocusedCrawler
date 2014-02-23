@@ -16,18 +16,21 @@ class CrawlThread(Thread):
         Thread.__init__(self)
         self.query = query
     
+    def stop(self):
+        self._stop()
+    
     def run(self):
-        print("Inside")
         while True:
             if not DS.linkQueue.empty():
-                dt = datetime.datetime.now()
-                fName = "dumps/"+str(dt.year)+str(dt.month)+str(dt.day)+str(dt.hour)+str(dt.minute)+"t"+self.name
-                #print(fName)
-                f = open(fName,"a", encoding='utf-8')
-                #print(DS.linkQueue.qsize())
                 url = ""
                 try:
                     c,u = DS.linkQueue.get()
+                    dt = datetime.datetime.now()
+                    fName = "dumps/"+str(dt.year)+str(dt.month)+str(dt.day)+str(dt.hour)+str(dt.minute)+"t"+self.name
+                    #print(fName)
+                    f = open(fName,"a", encoding='utf-8')
+                    #print(DS.linkQueue.qsize())
+                
                     #print("Processing (Cos:"+str(c)+" ): "+str(u))
                     url = u
                     dataParser = DP.DataParser()
@@ -49,8 +52,8 @@ class CrawlThread(Thread):
                     DS.size += (sys.getsizeof(data)/1073741824)
                     DS.count += 1
                     
-                    print("Total parsed size: " + str(DS.size) + " GB")
-                    print("Total parsed count: " + str(DS.count))
+                    #print("Total parsed size: " + str(DS.size) + " GB")
+                    #print("Total parsed count: " + str(DS.count))
                 except:
                     logName = "logs/"+self.query.replace(" ","-") + ".log"
                     logFile = open(logName, "a", encoding='utf-8')

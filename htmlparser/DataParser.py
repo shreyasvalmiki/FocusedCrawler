@@ -103,12 +103,12 @@ class DataParser(HTMLParser):
         proto = HTTP
         reFwdSlash = re.compile("^//.*")
         reStartPound = re.compile("^#.*")
-        reRelLink = re.compile('^[/]?.*')
-        
+        reRelLink1 = re.compile('^[/][a-zA-Z0-9].*')
+        reRelLink2 = re.compile('^[a-zA-Z0-9].*')
         reHttps = re.compile("^https://.*")
         #reHttp = re.compile("^http://.*")
-        
-        
+        reJavascript = re.compile("^javascript:.*")
+        reMailto = re.compile("^mailto:.*")
         #test
         #print("unchanged: "+link)
         
@@ -121,6 +121,12 @@ class DataParser(HTMLParser):
         if reStartPound.match(link):
             return ""
         
+        if reJavascript.match(link):
+            return ""
+        
+        if reMailto.match(link):
+            return ""
+        
         isCurrUrlOkay = self.checkrobot(self.url)
         
         
@@ -130,7 +136,7 @@ class DataParser(HTMLParser):
             link = proto + link
             
             
-        if reRelLink.match(link):
+        if reRelLink1.match(link) or reRelLink2.match(link):
             link = urljoin(self.url, link)
             #test
             #print("\tAdded Protocol: "+link)
