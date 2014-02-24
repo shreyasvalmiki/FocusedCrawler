@@ -13,32 +13,35 @@ from thr import ParentThread as PT
 '''
 Saves progress and stops all threads
 '''
+def sAndQ(filename, pt):
+    pt.stop()
+    setFilename = filename+"-s.json"
+    queueFilename = filename+"-q.json"
+    dataFilename = filename+"-d.json"
+    
+    setList = list(DS.linkSet)
+    queueList = []
+    while not DS.linkQueue.empty():
+        c,d = DS.linkQueue.get()
+        queueList.append((c,d))
+    
+    setFile = open(setFilename,"w")
+    setFile.write(json.dumps(setList))
+    setFile.close()
+    
+    queueFile = open(queueFilename,"w")
+    queueFile.write(json.dumps(queueList))
+    queueFile.close()
+    
+    dataFile = open(dataFilename,"w")
+    dataFile.write(json.dumps({"size":DS.size,"count":DS.count}))
+    dataFile.close()
+    
+    sys.exit(1)
+        
 def saveAndQuit(filename,pt):
     if input() == 'q':
-        pt.stop()
-        setFilename = filename+"-s.json"
-        queueFilename = filename+"-q.json"
-        dataFilename = filename+"-d.json"
-        
-        setList = list(DS.linkSet)
-        queueList = []
-        while not DS.linkQueue.empty():
-            c,d = DS.linkQueue.get()
-            queueList.append((c,d))
-        
-        setFile = open(setFilename,"w")
-        setFile.write(json.dumps(setList))
-        setFile.close()
-        
-        queueFile = open(queueFilename,"w")
-        queueFile.write(json.dumps(queueList))
-        queueFile.close()
-        
-        dataFile = open(dataFilename,"w")
-        dataFile.write(json.dumps({"size":DS.size,"count":DS.count}))
-        dataFile.close()
-        
-        sys.exit(1)
+        sAndQ(filename,pt)
     else:
         saveAndQuit(filename,pt)
  
@@ -80,7 +83,16 @@ else:
 
 print ('\n')
 
-input("Press any key to start. Once you start, press 'q' at any point in time to save progress and quit.")
+initCount = DS.count
+
+limit = 1000
+withLimit = False
+if input("Do you want to add a limit? Answer 'y' for yes else press any button: ") == 'y':
+    limit = int(input("Enter limit: "))
+    withLimit = True
+    input("Press any key to start.")
+else:
+    input("Press any key to start. Once you start, press 'q' at any point in time to save progress and quit.")
 
 
 pt = PT.ParentThread(query, DS.threadCount)
@@ -88,4 +100,10 @@ pt.start()
 
 print("\n\nCrawling...")
 
-saveAndQuit(saveFilename, pt)
+if withLimit:
+    while True:
+        if DS.count >= (limit + initCount):
+            sAndQ(saveFilename,pt)
+            break
+else:
+    saveAndQuit(saveFilename, pt)
