@@ -7,7 +7,9 @@ import re, math
 from collections import Counter
 
 WORD = re.compile(r'\w+')
-
+'''
+Gets the cosine product of the two strings
+'''
 def get_cosine(text1, text2):
     vec1 = text_to_vector(text1.lower())
     vec2 = text_to_vector(text2.lower())

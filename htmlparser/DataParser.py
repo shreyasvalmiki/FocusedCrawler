@@ -83,11 +83,8 @@ class DataParser(HTMLParser):
                             self.links.append(link)
         
     def handle_data(self, data):
-        #self.f = open("testfile.txt","a") 
         if self.record:
             try:
-                #print(data)
-                #self.f.write(str(data))
                 self.data = self.data + str(data)
             except:
                 pass
@@ -106,50 +103,46 @@ class DataParser(HTMLParser):
         reRelLink1 = re.compile('^[/][a-zA-Z0-9].*')
         reRelLink2 = re.compile('^[a-zA-Z0-9].*')
         reHttps = re.compile("^https://.*")
-        #reHttp = re.compile("^http://.*")
         reJavascript = re.compile("^javascript:.*")
         reMailto = re.compile("^mailto:.*")
-        #test
-        #print("unchanged: "+link)
+
         
-        
+        # Makes sure the link has a protocol
         if reHttps.match(self.url):
             proto = HTTPS
         else:
             proto = HTTP
         
+        # Removes all named anchors or fragments
         if reStartPound.match(link):
             return ""
         
+        # Removes javascript links
         if reJavascript.match(link):
             return ""
         
+        # Removes all mailto links
         if reMailto.match(link):
             return ""
         
-        isCurrUrlOkay = self.checkrobot(self.url)
-        
-        
+        # Adds protocol to link
         if reFwdSlash.match(link):
-            if not isCurrUrlOkay:
-                return ""
             link = proto + link
             
-            
+        # Joins URL to relative link   
         if reRelLink1.match(link) or reRelLink2.match(link):
             link = urljoin(self.url, link)
-            #test
-            #print("\tAdded Protocol: "+link)
+        
         
         lcLink = link.lower()
         subLink = lcLink[-MAX_EXT_LENGTH:]
         
+        # Removes unwanted extensions
         for ext in escapeExts:
             if subLink.find(ext) > -1:
                 return ""
-        #test
-        #print("\t\tFinal Link: "+link)
-        
+            
+        # Checks if link is okay to crawl with robots.txt
         if self.checkrobot(link):
             return link
         else:
@@ -163,6 +156,7 @@ class DataParser(HTMLParser):
     def get_links(self):
         return self.links 
     
+    # Checks robots.txt
     def checkrobot(self,u):
         try:
             robUrl = u if u.find("/", MAX_PROTO_LEN) == -1 else u[:u.find("/",MAX_PROTO_LEN)]

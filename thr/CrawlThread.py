@@ -15,10 +15,15 @@ class CrawlThread(Thread):
     def __init__(self, query):
         Thread.__init__(self)
         self.query = query
+        self.filnamePart = "dumps/"+self.query.replace(" ","-")
     
     def stop(self):
         self._stop()
     
+    
+    '''
+    This crawls pages based on priority
+    '''
     def run(self):
         while True:
             if not DS.linkQueue.empty():
@@ -26,12 +31,9 @@ class CrawlThread(Thread):
                 try:
                     c,u = DS.linkQueue.get()
                     dt = datetime.datetime.now()
-                    fName = "dumps/"+str(dt.year)+str(dt.month)+str(dt.day)+str(dt.hour)+str(dt.minute)+"t"+self.name
-                    #print(fName)
+                    fName = self.filnamePart+str(dt.year)+str(dt.month)+str(dt.day)+str(dt.hour)+"t"+self.name
                     f = open(fName,"a", encoding='utf-8')
-                    #print(DS.linkQueue.qsize())
-                
-                    #print("Processing (Cos:"+str(c)+" ): "+str(u))
+
                     url = u
                     dataParser = DP.DataParser()
                     rawData = urlrequest.urlopen(u).read().decode("utf-8")
@@ -43,7 +45,6 @@ class CrawlThread(Thread):
                     cos = cosine.get_cosine(self.query, data)
                     
                     links = dataParser.get_links()
-                    #print("\nLinks: ".join(links))
                     
                     for l in links:
                         DS.linkQueue.put((-cos,l))
@@ -52,8 +53,8 @@ class CrawlThread(Thread):
                     DS.size += (sys.getsizeof(data)/1073741824)
                     DS.count += 1
                     
-                    #print("Total parsed size: " + str(DS.size) + " GB")
-                    #print("Total parsed count: " + str(DS.count))
+                    print("Total Count: "+str(DS.count)+"; Total Size: "+str(DS.size)+" GB")
+                    
                 except:
                     logName = "logs/"+self.query.replace(" ","-") + ".log"
                     logFile = open(logName, "a", encoding='utf-8')

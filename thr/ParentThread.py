@@ -5,7 +5,9 @@ Created on Feb 22, 2014
 '''
 from thr import CrawlThread as CT
 from threading import Thread
-
+'''
+This creates crawler threads
+'''
 class ParentThread(Thread):
     def __init__(self, query, totalCount):
         Thread.__init__(self)

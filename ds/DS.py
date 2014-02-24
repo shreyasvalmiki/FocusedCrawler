@@ -16,4 +16,4 @@ count = 0
 
 size = 0.0
 
-threadCount = 10
+threadCount = 20
